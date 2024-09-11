@@ -1,0 +1,46 @@
+.header-wrapper{
+    background-color: #1E3563;
+    display: flex;
+    justify-content: space-between;
+    min-height: 70px;
+    align-items: center;
+    padding: 10px;
+}
+
+.account-wrapper{
+    margin-right: 10%;
+}
+
+.logo {
+    max-height: 40px;
+}
+
+.header-right img {
+    height: 21px;
+    width: 24px;
+}
+
+.header-right{
+    display: flex;
+    justify-content: space-evenly;
+    margin-right: 5%;
+}
+
+.header-left{
+    margin-left: 5%;
+}
+
+.cart-count-badge {
+    background-color: #68DD7C;
+    width: 15px;
+    height: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 12px;
+    position: absolute;
+    top: 0;
+    left: 13px;
+}

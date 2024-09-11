@@ -1,0 +1,209 @@
+/* app/styles/productCard.css */
+.product-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .productbadges-wrapper{
+    display: flex;
+    padding: 2px;
+  }
+
+  .new-badge {
+    background-color: #B2DAE0;
+    border-radius: 4px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 80px;
+    color: #1E3563;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .discount-badge{
+
+    margin-left: 3%;
+    background-color: #FACDCE;
+    border-radius: 4px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 120px;
+    color: #1E3563;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .wishlist-icon {
+    transition:transform 0.25s ease;
+  }
+
+  .wishlist-icon:hover {
+    transform:scale(1.2);
+  }
+
+
+  .wishlist{
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 1%;
+  }
+  
+  .product-image {
+    margin-top: 1%;;
+    height: 400px;
+    width: 400px;
+    object-fit: contain;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .product-title{
+    font-weight: 700;
+    font-size: 16px;
+    text-align: left;
+    color: #2B2B2B;
+  }
+  
+  .product-card p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #666;
+  }
+  
+  .product-price{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 22px;
+  }
+
+  .top-information{
+    margin-bottom: 5px;
+    border-bottom: #DEDEDE solid 1px;
+  }
+  
+  .product-description{
+    font-weight: 400;
+    font-size: 14px;
+    text-align: left;
+    color: #5D5F63
+  }
+  
+  .price-quantity-wrapper{
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+  }
+
+  .quantity-wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .quantity-buttons {
+    background-color: #E9ECF0;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .quantity-amount{
+    height: 50px;
+    width: 50px;
+    border: 2px #CCD0D6 solid;
+    border-radius: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1E3563;
+    font-size: 16px;
+    font-weight: bold;
+    margin-left: 2%;
+    margin-right: 2%;
+  }
+
+  .variant-select{
+    width: 100%;
+    background-color: #E9ECF0;
+    border-radius: 10px;
+    min-height: 50px;
+    padding: 10px;
+  }
+
+
+  /* Variant Picker 1 Start */
+  .variant-style-1{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 5px;
+    border-bottom: #DEDEDE solid 1px;
+  }
+
+  .one-top{
+    padding: 2px;
+    color: #2B2B2B;
+    font-weight: 400;
+    font-size: 12px;
+    margin-left: 10px;
+    text-align: left;
+  }
+  
+  .one-bottom{
+    display: grid;
+    padding: 5px;
+    grid-template-columns: repeat(1fr);
+  }
+
+  .options-wrapper{
+    display: flex;
+    justify-content: space-evenly;
+  }
+  .option{
+    margin-left: 5px;
+    margin-right: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    border: 1px solid black;
+    border-radius: 5px;
+    color: black;
+    font-weight: 700;
+    text-align: center;
+    size: 12px;
+    height: 40px;
+    box-shadow: 0 4px 6px rgba(165, 165, 165, 0.1);
+    transition:color 1.5s ease
+  }
+  .option:hover{
+    background-color: black;
+    color: white;
+    -webkit-transition: background-color 1500ms linear;
+    -ms-transition: background-color 1500ms linear;
+    transition: background-color 1500ms linear;
+  }
+   /* Variant Picker 1 End */
