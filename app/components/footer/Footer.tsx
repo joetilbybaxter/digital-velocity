@@ -1,5 +1,5 @@
 import "./Footer.css";
-import logo from "build/client/assets/home-slide-1-mobile-a2161694517b4264c8960f0979553f16.png";
+import logo from "/home-slide-1-mobile-a2161694517b4264c8960f0979553f16.png";
 
 export function Footer() {
   return (

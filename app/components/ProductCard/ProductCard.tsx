@@ -1,11 +1,11 @@
+import React, { useState, useEffect } from "react";
 import "./ProductCard.css";
-import minus from "build/client/assets/Vector (3).png";
-import plus from "build/client/assets/plus.png";
-import wishlist from "build/client/assets/Vector (4).png";
-import trophy from "build/client/assets/Vector (5).png";
-import tag from "build/client/assets/Vector (6).png";
-import { useState, useEffect } from "react";
-import { useCart } from "~/context/CartContext";
+import minus from "/Vector (3).png";
+import plus from "/plus.png";
+import wishlist from "/Vector (4).png";
+import trophy from "/Vector (5).png";
+import tag from "/Vector (6).png";
+import { useLoaderData } from "@remix-run/react";
 
 interface Product {
   id: string;
@@ -16,6 +16,7 @@ interface Product {
     amount: string;
     currencyCode: string;
   };
+  variantId: string; 
 }
 
 export const ProductCard: React.FC<Product> = ({
@@ -24,45 +25,212 @@ export const ProductCard: React.FC<Product> = ({
   description,
   imageSrc,
   price,
+  variantId, 
 }) => {
-  const { addToCart, decrementCartItem } = useCart();
-  const [quantity, setQuantity] = useState(0); // Quantity of the product
-  const [cartItem, setCartItem] = useState<{ id: string; title: string; price: string; imageSrc: string; } | null>(null); // New cart item object
+  const [quantity, setQuantity] = useState(0);
+  const [cartId, setCartId] = useState<string | null>(null);
+  const [cartLineId, setCartLineId] = useState<string | null>(null); 
 
-  // Increment quantity
-  const handleIncrement = () => {
-    setQuantity((prevQuantity) => prevQuantity + 1);
-    addToCart({
-      id: id,
-      title: title,
-      price: price.amount,
-      imageSrc: imageSrc,
-      quantity: 1, // Add with initial quantity 1
+  // Get environment variables from the loader
+  const { SHOPIFY_STORE_URL, SHOPIFY_ACCESS_TOKEN } = useLoaderData();
+
+  // Function to create a new cart if no cartId exists
+  const createCart = async () => {
+    const response = await fetch(`https://${SHOPIFY_STORE_URL}/api/2023-07/graphql.json`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Shopify-Storefront-Access-Token": SHOPIFY_ACCESS_TOKEN,
+      },
+      body: JSON.stringify({
+        query: `
+          mutation {
+            cartCreate {
+              cart {
+                id
+              }
+            }
+          }
+        `,
+      }),
     });
+
+    const result = await response.json();
+    const newCartId = result.data.cartCreate.cart.id;
+    localStorage.setItem("shopify_cart_id", newCartId); 
+    setCartId(newCartId); 
+    return newCartId;
   };
-  
-  // Decrement quantity
+
+  const getCartId = async () => {
+    let cartId = localStorage.getItem("shopify_cart_id");
+    if (!cartId) {
+      cartId = await createCart();
+    }
+    return cartId;
+  };
+
+  const fetchCartQuantity = async () => {
+    const currentCartId = await getCartId(); 
+
+    const query = `
+      {
+        cart(id: "${currentCartId}") {
+          lines(first: 10) {
+            edges {
+              node {
+                id
+                quantity
+                merchandise {
+                  ... on ProductVariant {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    try {
+      const response = await fetch(`https://${SHOPIFY_STORE_URL}/api/2023-07/graphql.json`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Shopify-Storefront-Access-Token": SHOPIFY_ACCESS_TOKEN,
+        },
+        body: JSON.stringify({ query }),
+      });
+
+      const result = await response.json();
+
+      const cartLine = result.data.cart.lines.edges.find(
+        (edge: any) => edge.node.merchandise.id === variantId
+      );
+
+      if (cartLine) {
+        setQuantity(cartLine.node.quantity); 
+        setCartLineId(cartLine.node.id); 
+      }
+    } catch (error) {
+      console.error("Error fetching cart quantity:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCartQuantity();
+  }, [variantId]);
+
+  const updateCart = async (newQuantity: number) => {
+    const currentCartId = await getCartId(); 
+
+    let query;
+
+    if (!cartLineId) {
+      // If no cart line ID, add the product to the cart
+      query = `
+        mutation {
+          cartLinesAdd(cartId: "${currentCartId}", lines: [{ quantity: ${newQuantity}, merchandiseId: "${variantId}" }]) {
+            cart {
+              id
+              lines(first: 10) {
+                edges {
+                  node {
+                    id
+                    quantity
+                    merchandise {
+                      ... on ProductVariant {
+                        id
+                        title
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
+    } else if (newQuantity > 0) {
+      // If cart line ID exists, update the quantity
+      query = `
+        mutation {
+          cartLinesUpdate(cartId: "${currentCartId}", lines: [{ id: "${cartLineId}", quantity: ${newQuantity} }]) {
+            cart {
+              id
+              lines(first: 10) {
+                edges {
+                  node {
+                    id
+                    quantity
+                    merchandise {
+                      ... on ProductVariant {
+                        id
+                        title
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
+    } else {
+      // If quantity is 0, remove the product from the cart
+      query = `
+        mutation {
+          cartLinesRemove(cartId: "${currentCartId}", lineIds: ["${cartLineId}"]) {
+            cart {
+              id
+            }
+          }
+        }
+      `;
+    }
+
+    try {
+      const response = await fetch(`https://${SHOPIFY_STORE_URL}/api/2023-07/graphql.json`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Shopify-Storefront-Access-Token": SHOPIFY_ACCESS_TOKEN,
+        },
+        body: JSON.stringify({ query }),
+      });
+
+      const result = await response.json();
+      console.log("Cart update result:", result);
+
+      if (!cartLineId && result.data.cartLinesAdd) {
+        const addedLine = result.data.cartLinesAdd.cart.lines.edges.find(
+          (edge: any) => edge.node.merchandise.id === variantId
+        );
+        if (addedLine) {
+          setCartLineId(addedLine.node.id);
+        }
+      }
+    } catch (error) {
+      console.error("Error updating the cart:", error);
+    }
+  };
+
+  // Increment product quantity
+  const handleIncrement = () => {
+    const newQuantity = quantity + 1;
+    setQuantity(newQuantity);
+    updateCart(newQuantity); 
+  };
+
+  // Decrement product quantity and remove from cart if quantity hits 0
   const handleDecrement = () => {
     if (quantity > 0) {
-      setQuantity((prevQuantity) => prevQuantity - 1);
-      decrementCartItem(id); // Decrement the item quantity in the global cart
+      const newQuantity = quantity - 1;
+      setQuantity(newQuantity);
+      updateCart(newQuantity); 
     }
   };
-
-  // Update the cart item object when the quantity goes above 0
-  useEffect(() => {
-    if (quantity > 0) {
-      const newCartItem = {
-        id,
-        title,
-        price: price.amount,
-        imageSrc: imageSrc ? imageSrc : "https://via.placeholder.com/150", 
-      };
-      setCartItem(newCartItem);
-    } else {
-      setCartItem(null); // If quantity is 0, remove the cart item
-    }
-  }, [quantity, id, title, price.amount, imageSrc]);
 
   return (
     <div key={id} className="product-card">
@@ -94,6 +262,19 @@ export const ProductCard: React.FC<Product> = ({
         <div className="top-information">
           <h2 className="product-title">{title}</h2>
           <p className="product-description">{description}</p>
+        </div>
+        <div className='variant-style-2'>
+        <div className='one-top'>
+                Choose Variant:
+            </div>
+            <select className='variant-select'
+            
+            >
+               <option value="" disabled selected>Select</option>
+              <option>Variant 1</option>
+              <option>Variant 2</option>
+              <option>Variant 3</option>
+            </select>
         </div>
 
         <div className="price-quantity-wrapper">

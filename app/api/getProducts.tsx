@@ -15,6 +15,13 @@ interface Product {
       currencyCode: string;
     };
   };
+  variants: {
+    edges: {
+      node: {
+        id: string; // Variant ID
+      };
+    }[];
+  };
 }
 
 interface ShopifyApiResponse {
@@ -49,6 +56,13 @@ const PRODUCTS_QUERY = `
           edges {
             node {
               src
+            }
+          }
+        }
+        variants(first: 1) {
+          edges {
+            node {
+              id
             }
           }
         }

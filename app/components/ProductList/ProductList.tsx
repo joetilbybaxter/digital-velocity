@@ -20,6 +20,13 @@ interface Product {
       currencyCode: string;
     };
   };
+  variants: {
+    edges: {
+      node: {
+        id: string; 
+      };
+    }[];
+  };
 }
 
 export const ProductList: React.FC = () => {
@@ -45,19 +52,24 @@ export const ProductList: React.FC = () => {
       <h1 className="page-title">This is a page title</h1>
       <div className="product-list">
         {products.length > 0 ? (
-          products.map((product) => (
-            <ProductCard
-              key={product.id}
-              id={product.id}
-              title={product.title}
-              description={product.description}
-              imageSrc={product.images.edges[0]?.node.src || ""}
-              price={{
-                amount: product.priceRange.minVariantPrice.amount,
-                currencyCode: product.priceRange.minVariantPrice.currencyCode,
-              }}
-            />
-          ))
+          products.map((product) => {
+            const variantId = product.variants.edges[0]?.node.id;
+
+            return (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                title={product.title}
+                description={product.description}
+                imageSrc={product.images.edges[0]?.node.src || ""}
+                price={{
+                  amount: product.priceRange.minVariantPrice.amount,
+                  currencyCode: product.priceRange.minVariantPrice.currencyCode,
+                }}
+                variantId={variantId} 
+              />
+            );
+          })
         ) : (
           <p>No products found</p>
         )}

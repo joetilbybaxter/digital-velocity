@@ -2,7 +2,7 @@
     background-color: #1E3563;
     display: grid;
     grid-template-columns: 3fr 1fr;
-    padding: 30px 10px 30px 10px;
+    padding: 30px;
     min-height: 250px;
 }
 
@@ -17,7 +17,6 @@
 }
 
 .footer-left{
-    margin-left: 5%;
     justify-content: center;
     color: white;
     display: flex;
@@ -25,7 +24,6 @@
 }
 
 .footer-right{
-    margin-right: 5%;
     color: white;
     text-decoration: underline;
     display: flex;
